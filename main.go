@@ -44,6 +44,21 @@ func postAlbums(c *gin.Context){
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
+func getAlbumsByID(c *gin.Context){
+	id := c.Param("id")
+
+	//se recorre el slice de albums
+	for _, a := range albums{
+		if a.ID == id{
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+
+	//si no se encuentra el album se devuelve un 404
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+}
+
 
 func main(){
 	router := gin.Default()
@@ -56,10 +71,12 @@ func main(){
 
 	//GET ALBUMS
 	router.GET("/albums", getAlbums)
-
 	//POST ALBUMS
 	router.POST("/albums", postAlbums)
+	//GET ALBUMS BY ID
+	router.GET("/albums/:id", getAlbumsByID)
 
+	//------------se levanta el servidor----------------
 	router.Run("localhost:8080")
 
 }
