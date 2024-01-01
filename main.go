@@ -59,6 +59,42 @@ func getAlbumsByID(c *gin.Context){
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+func updateAlbums(c *gin.Context) {
+	id := c.Param("id")
+
+	var updatedAlbum album
+
+	// Bind the JSON to the updatedAlbum variable
+	if err := c.BindJSON(&updatedAlbum); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON"})
+		return
+	}
+
+	// Find the album by ID
+	for i, a := range albums {
+		if a.ID == id {
+			// Update the fields if provided in the request
+			if updatedAlbum.Title != "" {
+				albums[i].Title = updatedAlbum.Title
+			}
+			if updatedAlbum.Artist != "" {
+				albums[i].Artist = updatedAlbum.Artist
+			}
+			if updatedAlbum.Price != 0 {
+				albums[i].Price = updatedAlbum.Price
+			}
+
+			// Return the updated album
+			c.IndentedJSON(http.StatusOK, albums[i])
+			return
+		}
+	}
+
+	// If the album with the given ID is not found, return a 404
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Album not found"})
+}
+
+
 
 func main(){
 	router := gin.Default()
@@ -75,6 +111,8 @@ func main(){
 	router.POST("/albums", postAlbums)
 	//GET ALBUMS BY ID
 	router.GET("/albums/:id", getAlbumsByID)
+	//UPDATE ALBUMS
+	router.PUT("/albums/:id", updateAlbums)
 
 	//------------se levanta el servidor----------------
 	router.Run("localhost:8080")
