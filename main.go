@@ -21,9 +21,27 @@ var albums = []album{
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
-//controller
+//-------conrtroller functions-----------
 func getAlbums(c *gin.Context){
+
+	//se devuelve el json con el slice de albums
 	c.IndentedJSON(http.StatusOK, albums)
+}
+
+func postAlbums(c *gin.Context){
+	var newAlbum album
+
+
+	//primero se bindea el json y luego se agrega al slice //BINDEAR es convertir un json a un objeto
+	if err := c.BindJSON(&newAlbum); err != nil{
+		return
+	}
+
+	//si NO hay error se agrega al slice
+	albums = append(albums, newAlbum)
+
+	//se devuelve el json con el nuevo album
+	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
 
@@ -38,6 +56,9 @@ func main(){
 
 	//GET ALBUMS
 	router.GET("/albums", getAlbums)
+
+	//POST ALBUMS
+	router.POST("/albums", postAlbums)
 
 	router.Run("localhost:8080")
 
